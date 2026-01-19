@@ -45,6 +45,8 @@ public class EmployeeController {
 	@PreAuthorize("hasRole('admin')")
 	@PostMapping("/addnewuser")
 	public String addNewUser(@RequestBody Employee employee) {
+		
+		System.out.println("New User is added");
 		return employeeService.addEmployee(employee);
 	}
 
