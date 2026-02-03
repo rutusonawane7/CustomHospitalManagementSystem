@@ -1,0 +1,84 @@
+package com.example.entity;
+
+import java.time.LocalDateTime;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+
+@Entity
+public class RefreshToken {
+	
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long Id;
+	
+	
+	@OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+	private UserInformation user;
+	
+	private String refreshToken;
+	
+	private LocalDateTime expiryDate;
+	
+	//private tokenCreatedAt
+
+	
+	
+	
+	
+	public RefreshToken() {
+		
+	}
+	
+	public RefreshToken(Long id, UserInformation user, String refreshToken, LocalDateTime expiryDate) {
+		super();
+		Id = id;
+		this.user = user;
+		this.refreshToken = refreshToken;
+		this.expiryDate = expiryDate;
+	}
+
+	public Long getId() {
+		return Id;
+	}
+
+	public void setId(Long id) {
+		Id = id;
+	}
+
+	public UserInformation getUser() {
+		return user;
+	}
+
+	public void setUser(UserInformation user) {
+		this.user = user;
+	}
+
+	public String getRefreshToken() {
+		return refreshToken;
+	}
+
+	public void setRefreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
+	public LocalDateTime getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(LocalDateTime instant) {
+		this.expiryDate = instant;
+	}
+
+	public boolean isExpired() {
+        return expiryDate.isBefore(LocalDateTime.now());
+    }
+	
+	
+	
+}

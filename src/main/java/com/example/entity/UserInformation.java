@@ -4,36 +4,40 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
-public class Employee extends BaseEntity {
+public class UserInformation extends BaseEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotBlank(message = "name must not be empty")
+	private String name;
+	
+	@NotBlank(message = "username must not be empty")
 	private String username;
 	
+	//@NotBlank(message = "password must not be empty")
 	private String password;
 	
+	@NotBlank(message = "roles must not be empty")
 	private String roles;
 
 	
-	public Employee() {
+	public UserInformation() {
 		super();
 	}
 
-	@Override
-	public String toString() {
-		return "Employee [id=" + id + ", username=" + username + ", password=" + password + ", roles=" + roles + "]";
-	}
 
-	public Employee(Long id, String username, String password, String roles) {
+	public UserInformation(Long id, String username, String password, String roles, String name) {
 		super();
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.roles = roles;
+		this.name = name;
 	}
 
 	public Long getId() {
@@ -66,6 +70,14 @@ public class Employee extends BaseEntity {
 
 	public void setRoles(String roles) {
 		this.roles = roles;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	

@@ -9,36 +9,44 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.example.entity.Employee;
+import com.example.entity.UserInformation;
 
-public class EmployeeDetails implements UserDetails {
+public class UserInformationDetails implements UserDetails {
 
-private Employee employee;
+
+private final UserInformation user;
+
 	
-	public EmployeeDetails(Employee employee) {
-		this.employee = employee;	
+	public UserInformationDetails(UserInformation user) {
+		super();
+		this.user = user;
 	}
+
+	public Long getId() {
+        return user.getId();
+    }
+
 	
 	
 	
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		SimpleGrantedAuthority simple= new SimpleGrantedAuthority(employee.getRoles());
-		ArrayList<SimpleGrantedAuthority> arrayList = new ArrayList();
-		arrayList.add(simple);
-		return arrayList;
+	    return List.of(
+	        new SimpleGrantedAuthority("ROLE_" + user.getRoles())
+	    );
 	}
+
 
 	@Override
 	public String getPassword() {
 		// TODO Auto-generated method stub
-		return employee.getPassword();
+		return user.getPassword();
 	}
 
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return employee.getUsername();
+		return user.getUsername();
 	}
 	
 	  @Override
@@ -62,12 +70,12 @@ private Employee employee;
 	    }
 	   
 
-	    public Employee getEmployee() {
-	        return employee;
+	    public UserInformation getEmployee() {
+	        return user;
 	    }
 	    
 	    public String getRoles() {
-	        return employee.getRoles();
+	        return user.getRoles();
 	    }
 
 }

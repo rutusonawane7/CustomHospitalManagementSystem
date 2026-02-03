@@ -9,7 +9,7 @@ import jakarta.persistence.MappedSuperclass;
 public abstract class BaseEntity {
 	
 	@Column(updatable = false)
-	private String createdBy;
+	private Long createdBy;
 	
 	private LocalDateTime CreatedAt;
 	
@@ -17,14 +17,14 @@ public abstract class BaseEntity {
 	
 	private LocalDateTime updatedAt;
 	
-	private Boolean isDeleted = false;
+	
 
-	public String getCreatedBy() {
+	public Long getCreatedBy() {
 		return createdBy;
 	}
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
+	public void setCreatedBy(Long long1) {
+		this.createdBy = long1;
 	}
 
 	public LocalDateTime getCreatedAt() {
@@ -51,13 +51,6 @@ public abstract class BaseEntity {
 		this.updatedAt = updatedAt;
 	}
 
-	public Boolean getIsDeleted() {
-		return isDeleted;
-	}
-
-	public void setIsDeleted(Boolean isDeleted) {
-		this.isDeleted = isDeleted;
-	}
 	
 
 	

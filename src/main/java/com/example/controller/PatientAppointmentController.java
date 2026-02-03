@@ -19,6 +19,8 @@ import com.example.dto.PatientAppointmentDto;
 import com.example.entity.PatientAppointment;
 import com.example.service.PatientAppointmentService;
 
+import jakarta.validation.Valid;
+
 @CrossOrigin(originPatterns = { "http://localhost:*", "http://192.168.1.*:*", "http://172.19.*.*:*" }, methods = {
 		RequestMethod.POST, RequestMethod.GET, RequestMethod.PUT, RequestMethod.OPTIONS })
 @RestController
@@ -75,7 +77,7 @@ public class PatientAppointmentController {
 	 */
 
 	@PostMapping("/patients/{patient_id}/appointments")
-	public PatientAppointmentDto createPatientAppointment(@PathVariable Long patient_id,
+	public PatientAppointmentDto createPatientAppointment(@Valid @PathVariable Long patient_id,
 			@RequestBody PatientAppointment appointment) {
 
 		logger.info("POST /patients/{}/appointments API called to create appointment", patient_id);

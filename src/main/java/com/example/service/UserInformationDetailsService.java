@@ -3,104 +3,130 @@ package com.example.service;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.context.SecurityContextHolder;
 
-
-import com.example.entity.Employee;
-import com.example.repository.EmployeeRepository;
+import com.example.dto.UserInformationDto;
+import com.example.entity.UserInformation;
+import com.example.exception.ResourceNotFoundException;
+import com.example.exception.UsernameAlreadyExistsException;
+import com.example.repository.UserInformationRepository;
 
 @Service
-public class EmployeeDetailsService implements UserDetailsService {
+public class UserInformationDetailsService implements UserDetailsService {
 
-	private final EmployeeRepository employeeRepository;
+	private final UserInformationRepository userInformationRepository;
 
-	public EmployeeDetailsService(EmployeeRepository employeeRepository) {
-		this.employeeRepository = employeeRepository;
+    private final PasswordEncoder passwordEncoder;
+
+	
+	public UserInformationDetailsService(UserInformationRepository userInformationRepository, PasswordEncoder passwordEncoder) {
+		super();
+		this.userInformationRepository = userInformationRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		Optional<Employee> employee = employeeRepository.findByusername(username);
+		Optional<UserInformation> userInformation = userInformationRepository.findByusername(username);
 
-		if (employee.isEmpty()) {
-			throw new UsernameNotFoundException("User not found" + username);
+		if (userInformation.isEmpty()) {
+			throw new UsernameNotFoundException("User not found " + username);
 		}
-		return new EmployeeDetails(employee.get());
+		return new UserInformationDetails(userInformation.get());
 
 	}
 
-	public String addEmployee(Employee employee) {
-		Optional<Employee> existingEmployee = employeeRepository.findByusername(employee.getUsername());
+	public UserInformationDto mapDto(UserInformation userInformation) {
+		UserInformationDto dtoObject = new UserInformationDto();
+		
+		dtoObject.setId(userInformation.getId());
+		dtoObject.setName(userInformation.getName());
+		dtoObject.setUsername(userInformation.getUsername());
+		dtoObject.setPassword(userInformation.getPassword());
+		dtoObject.setRoles(userInformation.getRoles());
+		
+		return dtoObject;
+	}
+	public UserInformationDto addEmployee(UserInformation employee) {
+		
+		Optional<UserInformation> existingEmployee = userInformationRepository.findByusername(employee.getUsername());
 		if (existingEmployee.isPresent()) {
-			throw new RuntimeException("Username is already exist");
+			throw new UsernameAlreadyExistsException("Username already exists");
 		}
 
-		employee.setPassword(new BCryptPasswordEncoder().encode(employee.getPassword()));
+		//employee.setPassword(new BCryptPasswordEncoder().encode(employee.getPassword()));
 		
-		String currentUser =
-	            SecurityContextHolder.getContext()
-	                                 .getAuthentication()
-	                                 .getName();
+        //employee.setPassword(passwordEncoder.encode(employee.getPassword()));
+
+		employee.setPassword(passwordEncoder.encode(employee.getUsername()));
+
+       Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        UserInformationDetails currentUser =
+                (UserInformationDetails) authentication.getPrincipal();
 
 		
-		employee.setCreatedBy(currentUser);
+		employee.setCreatedBy(currentUser.getId());
 		employee.setCreatedAt(LocalDateTime.now());
 		
 		
-		employeeRepository.save(employee);
+		userInformationRepository.save(employee);
 
-		return "employee added Successfully";
+		return mapDto(employee);
 	}
 
 	public String deleteEmployeeById(Long id) {
-		Employee employee = employeeRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Employee not found with this id" + id));
+		UserInformation employee = userInformationRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Employee not found with this id" + id));
 
-		employeeRepository.deleteById(id);
+		userInformationRepository.deleteById(id);
 
 		return "Employee Details Deleted Successfully !";
 	}
 
-	public String updateEmployee(Employee employee, Long id) {
-		// 1. Find employee by ID
-		Optional<Employee> employeeToUpdateOpt = employeeRepository.findById(id);
+	public UserInformationDto updateEmployee(UserInformation employee, Long id) {
+		
+		Optional<UserInformation> employeeToUpdateOpt = userInformationRepository.findById(id);
 		if (employeeToUpdateOpt.isEmpty()) {
-			throw new RuntimeException("Employee not found with Id: " + id);
+			throw new ResourceNotFoundException("Employee not found with Id: " + id);
 		}
-		Employee employeeToUpdate = employeeToUpdateOpt.get();
+		UserInformation employeeToUpdate = employeeToUpdateOpt.get();
 
-		// 2. Check if new username exists for another employee
-		Optional<Employee> existingEmployee = employeeRepository.findByusername(employee.getUsername());
+		
+		Optional<UserInformation> existingEmployee = userInformationRepository.findByusername(employee.getUsername());
 		if (existingEmployee.isPresent() && !existingEmployee.get().getId().equals(id)) {
-			throw new RuntimeException("Username is already exist");
+			throw new UsernameAlreadyExistsException("Username is already exist");
 		}
 
-		// 3. Update fields
+		
 		employeeToUpdate.setUsername(employee.getUsername());
 		employeeToUpdate.setRoles(employee.getRoles());
 
-		// 4. Encode password if provided
+		
 		if (employee.getPassword() != null && !employee.getPassword().isEmpty()) {
 			employeeToUpdate.setPassword(new BCryptPasswordEncoder().encode(employee.getPassword()));
 		}
 
-		// 5. Save updated employee
-		employeeRepository.save(employeeToUpdate);
+		
+		userInformationRepository.save(employeeToUpdate);
 
-		return "Employee updated successfully";
+		return mapDto(employeeToUpdate);
 	}
 
-	public Employee getEmployeeById(Long id) {
-		Employee employee = employeeRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Employee not found with id" + id));
+	public UserInformationDto getEmployeeById(Long id) {
+		UserInformation employee = userInformationRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Employee not found with id " + id));
 
-		return employee;
+		return mapDto(employee);
 	}
 
 }

@@ -22,19 +22,19 @@ public class PatientRegistration {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@NotBlank
+	@NotBlank(message = "Patient First Name is Blank, please Enter Patient First Name")
 	private String firstName;
 	
-	@NotBlank
+	@NotBlank(message = "Patient Last Name is Blank, please Enter Patient Last Name")
 	private String lastName;
 	
-	@NotBlank
+	@NotBlank(message = "Patient Contact Number is Blank, Please Enter Patient Contact Number")
 	private String contactNumber;
 	
-	@NotNull
+	@NotNull(message = "Patient Date of Birth is Blank, Please Enter Patient Date of Birth")
 	private LocalDate dateOfBirth;
 	
-	@NotBlank
+	@NotBlank(message = "Patient Gender is Blank, Please Enter Patient Gender")
 	private String gender;
 
 	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)

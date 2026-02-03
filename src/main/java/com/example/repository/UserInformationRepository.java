@@ -4,10 +4,10 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.entity.Employee;
+import com.example.entity.UserInformation;
 
-public interface EmployeeRepository extends JpaRepository<Employee, Long>{
+public interface UserInformationRepository extends JpaRepository<UserInformation, Long>{
 	
-	Optional<Employee> findByusername( String username);
+	Optional<UserInformation> findByusername( String username);
 
 }

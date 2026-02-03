@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.example.service.EmployeeDetailsService;
+import com.example.service.UserInformationDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -38,7 +38,9 @@ public class SecurityConfig {
             .requestMatchers(
                 "/auth/welcome",
                 "/auth/generateToken",
-                "/auth/login"
+                "/auth/login",
+                "/auth/logout",
+                "/auth/refresh"
             ).permitAll()
             .anyRequest().authenticated()
         )
@@ -46,26 +48,28 @@ public class SecurityConfig {
             sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
         .authenticationProvider(authenticationProvider)
+        .exceptionHandling(exception -> 
+        exception.authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // <-- here
+    )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
 }
 
 	
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+	
 	
 	  
 	    @Bean
-	    public AuthenticationProvider authenticationProvider(EmployeeDetailsService employeeUserDetailsService,
+	    public AuthenticationProvider authenticationProvider(UserInformationDetailsService employeeUserDetailsService,
 	            PasswordEncoder passwordEncoder) {
 	        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 	        provider.setUserDetailsService(employeeUserDetailsService);
-	        provider.setPasswordEncoder(passwordEncoder());
+	        provider.setPasswordEncoder(passwordEncoder);
+	        provider.setHideUserNotFoundExceptions(false);
 	        return provider;
 	    }
+	    
 	    @Bean
 	    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
 	        return config.getAuthenticationManager();

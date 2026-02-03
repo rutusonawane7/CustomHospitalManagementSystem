@@ -1,56 +1,60 @@
 package com.example.config;
 
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
-
-import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @Component
 public class JwtService {
 
-	public static final String SECRET = "5367566859703373367639792F423F452848284D6251655468576D5A71347437";
-	
-	
-	 public String generateToken(String email) { // Use email as username
-	        Map<String, Object> claims = new HashMap<>();
-	        return createToken(claims, email);
-	    }
 
-	    private String createToken(Map<String, Object> claims, String email) {
+
+	    public static final String SECRET =
+	            "5367566859703373367639792F423F452848284D6251655468576D5A71347437";
+
+	    private static final long ACCESS_TOKEN_EXPIRY = 1000 * 60 * 1; // 1 minute
+
+	    public String generateAccessToken(String email, String role) {
+
+	        Map<String, Object> claims = new HashMap<>();
+	        claims.put("role", role);
+	        claims.put("type", "ACCESS"); // 🔐 VERY IMPORTANT
+
 	        return Jwts.builder()
 	                .setClaims(claims)
 	                .setSubject(email)
 	                .setIssuedAt(new Date())
-	                .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 365 * 10)) // My current code is for 10 years Token Expiration  (1000 * 60 * 30 - 30 minutes)
+	                .setExpiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRY))
 	                .signWith(getSignKey(), SignatureAlgorithm.HS256)
 	                .compact();
 	    }
 
-	    private Key getSignKey() {
-	        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-	        return Keys.hmacShaKeyFor(keyBytes);
-	    }
-
 	    public String extractUsername(String token) {
-	        return extractClaim(token, Claims::getSubject);
+	        return extractAllClaims(token).getSubject();
 	    }
 
-	    public Date extractExpiration(String token) {
-	        return extractClaim(token, Claims::getExpiration);
+	    public boolean isAccessToken(String token) {
+	        return "ACCESS".equals(extractAllClaims(token).get("type"));
 	    }
 
-	    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-	        final Claims claims = extractAllClaims(token);
-	        return claimsResolver.apply(claims);
+	    public boolean isTokenExpired(String token) {
+	        return extractAllClaims(token).getExpiration().before(new Date());
+	    }
+
+	    public boolean validateToken(String token, UserDetails userDetails) {
+	        return extractUsername(token).equals(userDetails.getUsername())
+	                && !isTokenExpired(token)
+	                && isAccessToken(token);
 	    }
 
 	    private Claims extractAllClaims(String token) {
@@ -61,12 +65,8 @@ public class JwtService {
 	                .getBody();
 	    }
 
-	    private Boolean isTokenExpired(String token) {
-	        return extractExpiration(token).before(new Date());
-	    }
-
-	    public Boolean validateToken(String token, UserDetails userDetails) {
-	        final String username = extractUsername(token);
-	        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	    private Key getSignKey() {
+	        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+	        return Keys.hmacShaKeyFor(keyBytes);
 	    }
 	}
