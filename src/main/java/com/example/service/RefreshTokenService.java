@@ -25,16 +25,15 @@ public class RefreshTokenService {
 	    private final UserInformationRepository userInformationRepository;
 	    private final JwtService jwtService;
 
-	    public RefreshTokenService(
-	            RefreshTokenRepository refreshTokenRepository,
-	            UserInformationRepository userInformationRepository,
-	            JwtService jwtService) {
+	    public RefreshTokenService( RefreshTokenRepository refreshTokenRepository,UserInformationRepository userInformationRepository,JwtService jwtService) {
 
 	        this.refreshTokenRepository = refreshTokenRepository;
 	        this.userInformationRepository = userInformationRepository;
 	        this.jwtService = jwtService;
 	    }
 
+	    
+	    
 	    public RefreshToken createRefreshToken(Long userId) {
 
 	        RefreshToken token = new RefreshToken();
@@ -44,8 +43,12 @@ public class RefreshTokenService {
 	                LocalDateTime.now().plusSeconds(refreshTokenDurationMs / 1000)
 	        );
 
+	        token.setCreatedBy(userId);
 	        return refreshTokenRepository.save(token);
 	    }
+	    
+	    
+	    
 
 	    public Map<String, String> refreshToken(String refreshToken) {
 
@@ -70,6 +73,7 @@ public class RefreshTokenService {
 	                        user.getRoles()
 	                );
 
+	        //token.setCreatedBy(userId);
 	        return Map.of(
 	                "accessToken", accessToken,
 	                "refreshToken", newToken.getRefreshToken()

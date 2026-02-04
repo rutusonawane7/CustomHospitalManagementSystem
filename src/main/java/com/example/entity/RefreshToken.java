@@ -8,9 +8,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 
 @Entity
-public class RefreshToken {
+public class RefreshToken extends BaseEntity{
 	
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,9 +27,17 @@ public class RefreshToken {
 	
 	private LocalDateTime expiryDate;
 	
-	//private tokenCreatedAt
+	private LocalDateTime tokenCreatedAt;
 
-	
+	@PrePersist
+    public void onCreate() {
+        tokenCreatedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void onUpdate() {
+        tokenCreatedAt = LocalDateTime.now(); 
+    }
 	
 	
 	
