@@ -7,6 +7,9 @@ public class CustomError {
 	private LocalDateTime timestamp;
 	private int status;
 	private String message;
+	
+	
+	
 	public CustomError(LocalDateTime timestamp, int status, String message) {
 		super();
 		this.timestamp = timestamp;

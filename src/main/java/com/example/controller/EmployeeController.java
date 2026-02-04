@@ -84,9 +84,8 @@ public class EmployeeController {
 		return employeeService.getEmployeeById(id);
 	}
 
-		@PostMapping("/login")
-	public ResponseEntity<?> authenticateAndGetToken(
-	        @RequestBody AuthRequest authRequest) {
+	@PostMapping("/login")
+	public ResponseEntity<?> authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
 
 	    Authentication authentication = authenticationManager.authenticate(
 	            new UsernamePasswordAuthenticationToken(

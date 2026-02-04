@@ -21,10 +21,13 @@ import com.example.service.UserInformationDetailsService;
 public class SecurityConfig {
 	
 	private final JwtAuthFilter jwtAuthFilter;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
 	
-	public SecurityConfig(JwtAuthFilter jwtAuthFilter){
+	public SecurityConfig(JwtAuthFilter jwtAuthFilter,JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint){
 		
 		this.jwtAuthFilter = jwtAuthFilter;
+		this.jwtAuthenticationEntryPoint=jwtAuthenticationEntryPoint;
 		
 		
 	}
@@ -49,7 +52,7 @@ public class SecurityConfig {
         )
         .authenticationProvider(authenticationProvider)
         .exceptionHandling(exception -> 
-        exception.authenticationEntryPoint(new JwtAuthenticationEntryPoint()) // <-- here
+        exception.authenticationEntryPoint(jwtAuthenticationEntryPoint) // <-- here
     )
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -25,7 +25,7 @@ public abstract class BaseEntity {
 	private LocalDateTime CreatedAt;
 	
 	@LastModifiedBy
-	private String updatedBy;
+	private Long updatedBy;
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;
@@ -48,11 +48,11 @@ public abstract class BaseEntity {
 		CreatedAt = createdAt;
 	}
 
-	public String getUpdatedBy() {
+	public Long getUpdatedBy() {
 		return updatedBy;
 	}
 
-	public void setUpdatedBy(String updatedBy) {
+	public void setUpdatedBy(Long updatedBy) {
 		this.updatedBy = updatedBy;
 	}
 

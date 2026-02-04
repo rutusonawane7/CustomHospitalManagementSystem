@@ -10,8 +10,11 @@ import org.springframework.stereotype.Service;
 import com.example.config.JwtService;
 import com.example.entity.RefreshToken;
 import com.example.entity.UserInformation;
+import com.example.exception.JwtAuthException;
 import com.example.repository.RefreshTokenRepository;
 import com.example.repository.UserInformationRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class RefreshTokenService {
@@ -34,46 +37,62 @@ public class RefreshTokenService {
 
 	    
 	    
+	    @Transactional
 	    public RefreshToken createRefreshToken(Long userId) {
+	    	UserInformation user = userInformationRepository.findById(userId)
+	                .orElseThrow(() -> new RuntimeException("User not found"));
 
-	        RefreshToken token = new RefreshToken();
-	        token.setUser(userInformationRepository.findById(userId).orElseThrow());
-	        token.setRefreshToken(UUID.randomUUID().toString());
-	        token.setExpiryDate(
+	    	
+	    	refreshTokenRepository.deleteByUser(user);
+	    	String token;
+	        do {
+	            token = UUID.randomUUID().toString();
+	        } while (refreshTokenRepository.findByRefreshToken(token).isPresent());
+
+
+	        RefreshToken refreshToken = new RefreshToken();
+	        refreshToken.setUser(userInformationRepository.findById(userId).orElseThrow());
+	        refreshToken.setRefreshToken(UUID.randomUUID().toString());
+	        refreshToken.setExpiryDate(
 	                LocalDateTime.now().plusSeconds(refreshTokenDurationMs / 1000)
 	        );
 
-	        token.setCreatedBy(userId);
-	        return refreshTokenRepository.save(token);
+	        refreshToken.setCreatedBy(userId);
+	        return refreshTokenRepository.save(refreshToken);
 	    }
 	    
 	    
 	    
-
+	    @Transactional
 	    public Map<String, String> refreshToken(String refreshToken) {
-
-	        RefreshToken token = refreshTokenRepository
-	                .findByRefreshToken(refreshToken)
-	                .orElseThrow(() -> new RuntimeException("refresh token expired"));
-
-	        if (token.getExpiryDate().isBefore(LocalDateTime.now())) {
+	    	if (refreshToken == null || refreshToken.isBlank()) {
+	            throw new JwtAuthException(
+	                    "REFRESH_MISSING",
+	                    "refresh token is missing"
+	            );
+	        }
+	    	 
+	        RefreshToken token = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> 
+	        new JwtAuthException("REFRESH_INVALID", "refresh token is invalid")
+	                );
+	        if (token.getExpiryDate().isBefore(LocalDateTime.now())) 
+	        {
 	            refreshTokenRepository.delete(token);
-	            throw new RuntimeException("refresh token expired");
+	            throw new JwtAuthException("REFRESH_EXPIRED", "refresh token expired");
 	        }
 
 	        UserInformation user = token.getUser();
 
-	        // ROTATE refresh token
+	        
 	        refreshTokenRepository.delete(token);
+	        
 	        RefreshToken newToken = createRefreshToken(user.getId());
 
-	        String accessToken =
-	                jwtService.generateAccessToken(
-	                        user.getUsername(),
-	                        user.getRoles()
-	                );
+	        String accessToken =jwtService.generateAccessToken(user.getUsername(),user.getRoles());
+	                        
+	                
 
-	        //token.setCreatedBy(userId);
+	        
 	        return Map.of(
 	                "accessToken", accessToken,
 	                "refreshToken", newToken.getRefreshToken()

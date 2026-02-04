@@ -14,6 +14,7 @@ import com.example.service.UserInformationDetails;
 @Configuration
 @EnableJpaAuditing
 public class JpaAuditConfig {
+	
 	@Bean
     public AuditorAware<Long> auditorProvider() {
         return () -> {
