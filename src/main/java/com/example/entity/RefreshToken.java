@@ -88,6 +88,15 @@ public class RefreshToken extends BaseEntity{
 	public boolean isExpired() {
         return expiryDate.isBefore(LocalDateTime.now());
     }
+
+	public LocalDateTime getTokenCreatedAt() {
+		return tokenCreatedAt;
+	}
+
+	public void setTokenCreatedAt(LocalDateTime tokenCreatedAt) {
+		this.tokenCreatedAt = tokenCreatedAt;
+	}
+	
 	
 	
 	

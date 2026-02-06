@@ -60,7 +60,6 @@ public class EmployeeController {
 	@PostMapping("/addnewuser")
 	public UserInformationDto addNewUser(@Valid @RequestBody UserInformation employee) {
 		
-		System.out.println("New User is added");
 		return employeeService.addEmployee(employee);
 	}
 
@@ -134,7 +133,6 @@ public class EmployeeController {
 	    return ResponseEntity.ok(refreshTokenService.refreshToken(refreshToken));
 	}
 
-	
 	
 	@PostMapping("/logout")
     public ResponseEntity<?> logoutUser(@RequestBody Map<String, String> payload) {

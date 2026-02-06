@@ -20,31 +20,7 @@ public class PatientAppointmentService {
 	@Autowired
 	PatientRegistrationRepository patientRepository;
 
-	/*
-	 * public PatientAppointment save(Long patient_id, PatientAppointment
-	 * appointment) { PatientRegistration patient =
-	 * patientRepository.findById(patient_id) .orElseThrow(() -> new
-	 * RuntimeException("this id is not found"));
-	 * 
-	 * appointment.setPatient(patient);
-	 * 
-	 * return appointmentRepository.save(appointment); }
-	 */
-
-	/*public List<PatientAppointment> getAllAppointments() {
-		return appointmentRepository.findAll();
-	}
-
-	public String updateAppointment(Long id, PatientAppointment appointment) {
-		PatientAppointment existingAppoitnment = appointmentRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Appointment is not found"));
-
-		existingAppoitnment.setAppointmentDate(appointment.getAppointmentDate());
-		existingAppoitnment.setRemark(appointment.getRemark());
-		appointmentRepository.save(existingAppoitnment);
-
-		return "Appointment Updated Successfully ";
-	}*/
+	
 
 	public String cancelAppointmentById(Long id) {
 		PatientAppointment appointment = appointmentRepository.findById(id)
@@ -53,25 +29,8 @@ public class PatientAppointmentService {
 		return ("Appointment Cancle Successfully ");
 	}
 
-	/*
-	 * public List<PatientAppointment> getAppointmentsByPatientId(Long patient_id) {
-	 * System.out.println("2 Get appointment by patient id"+patient_id);
-	 * List<PatientAppointment> data =
-	 * appointmentRepository.findByPatientId(patient_id);
-	 * 
-	 * System.out.println("2 Get appointment by patient id"+data.size());
-	 * 
-	 * return data; }
-	 */
-
-	/*
-	 * public Optional<PatientAppointment> getAppointmentByAppointmentId(Long id) {
-	 * return appointmentRepository.findById(id);
-	 * 
-	 * }
-	 * 
-	 * 
-	 * /*
+	
+	 /*
 	 * 
 	 * Curd by using dto
 	 * 

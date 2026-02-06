@@ -67,18 +67,18 @@ public class RefreshTokenService {
 	    public Map<String, String> refreshToken(String refreshToken) {
 	    	if (refreshToken == null || refreshToken.isBlank()) {
 	            throw new JwtAuthException(
-	                    "REFRESH_MISSING",
+	                    "REFRESH TOKEN MISSING",
 	                    "refresh token is missing"
 	            );
 	        }
 	    	 
 	        RefreshToken token = refreshTokenRepository.findByRefreshToken(refreshToken).orElseThrow(() -> 
-	        new JwtAuthException("REFRESH_INVALID", "refresh token is invalid")
+	        new JwtAuthException("REFRESH TOKEN INVALID", "refresh token is invalid")
 	                );
 	        if (token.getExpiryDate().isBefore(LocalDateTime.now())) 
 	        {
 	            refreshTokenRepository.delete(token);
-	            throw new JwtAuthException("REFRESH_EXPIRED", "refresh token expired");
+	            throw new JwtAuthException("REFRESH TOKEN EXPIRED", "refresh token expired");
 	        }
 
 	        UserInformation user = token.getUser();
@@ -89,8 +89,8 @@ public class RefreshTokenService {
 	        RefreshToken newToken = createRefreshToken(user.getId());
 
 	        String accessToken =jwtService.generateAccessToken(user.getUsername(),user.getRoles());
-	                        
-	                
+	        
+	       
 
 	        
 	        return Map.of(

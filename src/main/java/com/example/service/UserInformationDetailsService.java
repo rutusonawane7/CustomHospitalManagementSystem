@@ -115,7 +115,16 @@ public class UserInformationDetailsService implements UserDetailsService {
 		if (employee.getPassword() != null && !employee.getPassword().isEmpty()) {
 			employeeToUpdate.setPassword(new BCryptPasswordEncoder().encode(employee.getPassword()));
 		}
+		 Authentication authentication =
+	                SecurityContextHolder.getContext().getAuthentication();
 
+	        UserInformationDetails currentUser =
+	                (UserInformationDetails) authentication.getPrincipal();
+
+			
+			employee.setUpdatedBy(currentUser.getId());
+			//employee.setUpdatedBy(LocalDateTime.now());
+			
 		
 		userInformationRepository.save(employeeToUpdate);
 

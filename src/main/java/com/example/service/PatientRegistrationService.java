@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.controller.PatientRegistrationController;
 import com.example.dto.PatientRegistrationDto;
 import com.example.entity.PatientRegistration;
 import com.example.repository.PatientRegistrationRepository;

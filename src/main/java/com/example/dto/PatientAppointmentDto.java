@@ -2,8 +2,6 @@ package com.example.dto;
 
 import java.time.LocalDate;
 
-import com.example.entity.PatientRegistration;
-
 public class PatientAppointmentDto {
 	private Long id;
 	
