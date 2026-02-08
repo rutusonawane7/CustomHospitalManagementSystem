@@ -62,10 +62,6 @@ public class UserInformationDetailsService implements UserDetailsService {
 			throw new UsernameAlreadyExistsException("Username already exists");
 		}
 
-		//employee.setPassword(new BCryptPasswordEncoder().encode(employee.getPassword()));
-		
-        //employee.setPassword(passwordEncoder.encode(employee.getPassword()));
-
 		employee.setPassword(passwordEncoder.encode(employee.getUsername()));
 
        Authentication authentication =

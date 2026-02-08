@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import com.example.exception.CustomAccessDeniedHandler;
+import com.example.exception.CustomAuthEntryPoint;
 import com.example.service.UserInformationDetailsService;
 
 @Configuration
@@ -21,16 +23,24 @@ public class SecurityConfig {
 	
 	private final JwtAuthFilter jwtAuthFilter;
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-
+	private final CustomAuthEntryPoint customAuthEntryPoint;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
 	
-	public SecurityConfig(JwtAuthFilter jwtAuthFilter,JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint){
-		
+	
+	
+	public SecurityConfig(JwtAuthFilter jwtAuthFilter, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+			CustomAuthEntryPoint customAuthEntryPoint, CustomAccessDeniedHandler customAccessDeniedHandler) {
+		super();
 		this.jwtAuthFilter = jwtAuthFilter;
-		this.jwtAuthenticationEntryPoint=jwtAuthenticationEntryPoint;
-		
-		
+		this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+		this.customAuthEntryPoint = customAuthEntryPoint;
+		this.customAccessDeniedHandler = customAccessDeniedHandler;
 	}
-	
+
+
+
+
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http,
 			AuthenticationProvider authenticationProvider) throws Exception{
@@ -53,7 +63,11 @@ public class SecurityConfig {
         .exceptionHandling(exception -> 
         exception.authenticationEntryPoint(jwtAuthenticationEntryPoint) // <-- here
     )
-        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).addFilter(jwtAuthFilter)
+        .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(customAuthEntryPoint)
+                .accessDeniedHandler(customAccessDeniedHandler)
+            );
 
     return http.build();
 }
